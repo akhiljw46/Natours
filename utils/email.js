@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const nodemailerSendgrid = require('nodemailer-sendgrid');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
 
@@ -13,7 +14,20 @@ module.exports = class Email {
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
       // Sendgrid
-      return 1;
+      return nodemailer.createTransport(
+        nodemailerSendgrid({
+          apiKey: process.env.SENDGRID_PASSWORD,
+        })
+      );
+      // return nodemailer.createTransport({
+      //   // service: 'SendGrid',
+      //   host: 'smtp.sendgrid.net',
+      //   port: 25,
+      //   auth: {
+      //     user: process.env.SENDGRID_USERNAME,
+      //     pass: process.env.SENDGRID_PASSWORD,
+      //   },
+      // });
     }
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -50,7 +64,10 @@ module.exports = class Email {
     await this.send('welcome', 'Welcome to the Natours Family!');
   }
 
-  async sendPasswordReset(){
-    await this.send('passwordReset', 'Your password reset token (valid for only 10 minutes')
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your password reset token (valid for only 10 minutes'
+    );
   }
 };
