@@ -11,7 +11,7 @@ const router = express.Router();
 //     user: 'Akhil',
 //   });
 // });
-
+router.use(viewsController.alerts);
 router.get(
   '/',
   // bookingController.createBookingCheckout,

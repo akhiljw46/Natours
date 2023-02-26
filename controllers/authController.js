@@ -80,7 +80,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   let token;
   // 1) Getting token and check of it's there
   if (
-    .authorization &&
+    req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
