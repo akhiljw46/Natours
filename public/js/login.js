@@ -31,7 +31,14 @@ export const logout = async () => {
       url: '/api/v1/users/logout',
     });
 
-    if (res.data.status === 'success') location.reload(true);
+    if (res.data.status === 'success') {
+      // location.reload(true);
+      showAlert('success', 'Logged out successfully!');
+      window.setTimeout(() => {
+        if (location.pathname === '/me') return location.assign('/');
+        location.reload(true);
+      }, 1500);
+    }
   } catch (err) {
     console.log(err);
     showAlert('error', 'Error logging out! Try again.');
