@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const nodemailerSendgrid = require('nodemailer-sendgrid');
+// const nodemailerSendgrid = require('nodemailer-sendgrid');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
 
@@ -14,11 +14,11 @@ module.exports = class Email {
   newTransport() {
     if (process.env.NODE_ENV === 'production') {
       // Sendgrid
-      return nodemailer.createTransport(
-        nodemailerSendgrid({
-          apiKey: process.env.SENDGRID_PASSWORD,
-        })
-      );
+      // return nodemailer.createTransport(
+      //   nodemailerSendgrid({
+      //     apiKey: process.env.SENDGRID_PASSWORD,
+      //   })
+      // );
       // return nodemailer.createTransport({
       //   // service: 'SendGrid',
       //   host: 'smtp.sendgrid.net',
@@ -28,6 +28,16 @@ module.exports = class Email {
       //     pass: process.env.SENDGRID_PASSWORD,
       //   },
       // });
+
+      // Mailjet
+      return nodemailer.createTransport({
+        host: process.env.MAILJET_HOST,
+        port: process.env.MAILJET_PORT,
+        auth: {
+          user: process.env.MAILJET_API_KEY,
+          pass: process.env.MAILJET_SECRET_KEY,
+        },
+      });
     }
     return nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
@@ -67,7 +77,7 @@ module.exports = class Email {
   async sendPasswordReset() {
     await this.send(
       'passwordReset',
-      'Your password reset token (valid for only 10 minutes'
+      'Your password reset token (valid for only 10 minutes)'
     );
   }
 };
