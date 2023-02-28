@@ -40,7 +40,7 @@ if (signupForm)
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const passwordConfirm = document.getElementById('password-confirm').value;
-    console.log(userName, email, password, passwordConfirm);
+    // console.log(userName, email, password, passwordConfirm);
     signup(userName, email, password, passwordConfirm);
   });
 
