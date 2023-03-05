@@ -1,4 +1,8 @@
 const nodemailer = require('nodemailer');
+const mailjet = require('node-mailjet').connect(
+  process.env.MAILJET_API_KEY,
+  process.env.MAILJET_SECRET_KEY
+);
 // const nodemailerSendgrid = require('nodemailer-sendgrid');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
@@ -28,25 +32,25 @@ module.exports = class Email {
       //     pass: process.env.SENDGRID_PASSWORD,
       //   },
       // });
-
       // Mailjet
+      // return nodemailer.createTransport({
+      //   host: process.env.MAILJET_HOST,
+      //   port: process.env.MAILJET_PORT,
+      //   auth: {
+      //     user: process.env.MAILJET_API_KEY,
+      //     pass: process.env.MAILJET_SECRET_KEY,
+      //   },
+      // });
+    } else {
       return nodemailer.createTransport({
-        host: process.env.MAILJET_HOST,
-        port: process.env.MAILJET_PORT,
+        host: process.env.EMAIL_HOST,
+        port: process.env.EMAIL_PORT,
         auth: {
-          user: process.env.MAILJET_API_KEY,
-          pass: process.env.MAILJET_SECRET_KEY,
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
         },
       });
     }
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: process.env.EMAIL_PORT,
-      auth: {
-        user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
   }
 
   // Send the actual email
@@ -57,17 +61,48 @@ module.exports = class Email {
       url: this.url,
       subject,
     });
-    // 2) Define email options
-    const mailOptions = {
-      from: this.from,
-      to: this.to,
-      subject,
-      html,
-      text: htmlToText.convert(html),
-    };
 
-    // 3) Create a transport and send emaiol
-    await this.newTransport().sendMail(mailOptions);
+    // 2) Define email options
+    if (process.env.NODE_ENV === 'development') {
+      const mailOptions = {
+        from: this.from,
+        to: this.to,
+        subject,
+        html,
+        text: htmlToText.convert(html),
+      };
+
+      // 3) Create a transport and send emaiol
+      await this.newTransport().sendMail(mailOptions);
+    } else {
+      // Mailjet new
+
+      const request = mailjet.post('send', { version: 'v3.1' }).request({
+        Messages: [
+          {
+            From: {
+              Email: 'akhiljw46@gmail.com',
+              Name: 'Akhil Augustin',
+            },
+            To: [
+              {
+                Email: this.to,
+                Name: this.firstName,
+              },
+            ],
+            Subject: subject,
+            HTMLPart: html,
+          },
+        ],
+      });
+      request
+        .then((result) => {
+          console.log(result.body);
+        })
+        .catch((err) => {
+          console.log(err.statusCode);
+        });
+    }
   }
 
   async sendWelcome() {
