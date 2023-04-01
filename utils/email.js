@@ -1,9 +1,6 @@
 const nodemailer = require('nodemailer');
 const Mailjet = require('node-mailjet');
-const mailjet = Mailjet.apiConnect(
-  process.env.MAILJET_API_KEY,
-  process.env.MAILJET_SECRET_KEY
-);
+
 // const nodemailerSendgrid = require('nodemailer-sendgrid');
 const pug = require('pug');
 const htmlToText = require('html-to-text');
@@ -77,7 +74,10 @@ module.exports = class Email {
       await this.newTransport().sendMail(mailOptions);
     } else {
       // Mailjet new
-
+      const mailjet = Mailjet.apiConnect(
+        process.env.MAILJET_API_KEY,
+        process.env.MAILJET_SECRET_KEY
+      );
       const request = mailjet.post('send', { version: 'v3.1' }).request({
         Messages: [
           {
